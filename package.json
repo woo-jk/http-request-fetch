@@ -1,8 +1,8 @@
 {
   "name": "http-request-fetch",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "prepack": "yarn build",
     "build": "yarn build:tsc",
