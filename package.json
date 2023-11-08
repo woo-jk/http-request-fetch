@@ -1,6 +1,24 @@
 {
   "name": "http-request-fetch",
-  "version": "0.0.1",
+  "version": "0.1.0",
+  "type": "module",
   "main": "index.js",
-  "license": "MIT"
+  "scripts": {
+    "prepack": "yarn build",
+    "build": "yarn build:tsc",
+    "build:tsc": "yarn tsc"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.ts",
+      "require": "./src/index.cts",
+      "default": "./dist/index.ts"
+    }
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.9.0",
+    "typescript": "^5.2.2"
+  }
 }
