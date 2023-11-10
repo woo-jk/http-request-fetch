@@ -74,7 +74,6 @@ const createHttp = (baseURL = "", defaultConfig: RequestInit = {}) => {
         ...config,
         method: "DELETE",
       }),
-
     registerInterceptor: (customInterceptor: Partial<Interceptor>) => {
       interceptor = {
         ...interceptor,
