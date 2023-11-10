@@ -23,83 +23,65 @@ const processHttpResponse = async <T extends object>(response: Response, config:
   return { data, config, headers, ok, redirected, status, statusText, type, url };
 };
 
-class Http {
-  private baseURL: string;
+const createHttp = (baseURL = "", defaultConfig: RequestInit = {}) => {
+  let interceptor: Interceptor = {
+    onRequest: (config) => config,
+    onResponse: (response) => response,
+    onRequestError: (reason) => Promise.reject(reason),
+    onResponseError: (reason) => Promise.reject(reason),
+  };
 
-  private defaultConfig: RequestInit;
-
-  private interceptor: Interceptor;
-
-  constructor(baseURL = "", defaultConfig: RequestInit = {}) {
-    this.baseURL = baseURL;
-    this.defaultConfig = defaultConfig;
-    this.interceptor = {
-      onRequest: (config) => config,
-      onResponse: (response) => response,
-      onRequestError: (reason) => Promise.reject(reason),
-      onResponseError: (reason) => Promise.reject(reason),
-    };
-  }
-
-  registerInterceptor(interceptor: Partial<Interceptor>) {
-    this.interceptor = {
-      ...this.interceptor,
-      ...interceptor,
-    };
-  }
-
-  request<T extends object = object>(url: string, config: RequestInit) {
+  const request = async <T extends object = object>(url: string, config: RequestInit) => {
     if (!url.startsWith("http")) {
-      url = `${this.baseURL}${url}`;
+      url = `${baseURL}${url}`;
     }
 
-    config = { ...this.defaultConfig, ...this.interceptor.onRequest(config) };
-    config.headers = { ...this.defaultConfig.headers, ...config.headers };
+    config = { ...defaultConfig, ...interceptor.onRequest(config) };
+    config.headers = { ...defaultConfig.headers, ...config.headers };
 
     try {
-      return fetch(url, config)
-        .then((response) => processHttpResponse<T>(response, config))
-        .then(this.interceptor.onResponse)
-        .catch(this.interceptor.onResponseError);
+      const response = await fetch(url, config);
+      return processHttpResponse<T>(response, config).then(interceptor.onResponse).catch(interceptor.onResponseError);
     } catch (reason) {
-      return this.interceptor.onRequestError(reason);
+      return interceptor.onRequestError(reason);
     }
-  }
+  };
 
-  get<T extends object>(url: string, config: RequestInit = {}) {
-    return this.request<T>(url, {
-      ...config,
-      method: "GET",
-    });
-  }
+  return {
+    request,
+    get: <T extends object>(url: string, config: RequestInit = {}) =>
+      request<T>(url, {
+        ...config,
+        method: "GET",
+      }),
+    post: <T extends object>(url: string, config: RequestInit = {}) =>
+      request<T>(url, {
+        ...config,
+        method: "POST",
+      }),
+    patch: <T extends object>(url: string, config: RequestInit = {}) =>
+      request<T>(url, {
+        ...config,
+        method: "PATCH",
+      }),
+    put: <T extends object>(url: string, config: RequestInit = {}) =>
+      request<T>(url, {
+        ...config,
+        method: "PUT",
+      }),
+    delete: <T extends object>(url: string, config: RequestInit = {}) =>
+      request<T>(url, {
+        ...config,
+        method: "DELETE",
+      }),
 
-  post<T extends object>(url: string, config: RequestInit = {}) {
-    return this.request<T>(url, {
-      ...config,
-      method: "POST",
-    });
-  }
+    registerInterceptor: (customInterceptor: Partial<Interceptor>) => {
+      interceptor = {
+        ...interceptor,
+        ...customInterceptor,
+      };
+    },
+  };
+};
 
-  patch<T extends object>(url: string, config: RequestInit = {}) {
-    return this.request<T>(url, {
-      ...config,
-      method: "PATCH",
-    });
-  }
-
-  put<T extends object>(url: string, config: RequestInit = {}) {
-    return this.request<T>(url, {
-      ...config,
-      method: "PUT",
-    });
-  }
-
-  delete<T extends object>(url: string, config: RequestInit = {}) {
-    return this.request<T>(url, {
-      ...config,
-      method: "DELETE",
-    });
-  }
-}
-
-export default Http;
+export default createHttp;

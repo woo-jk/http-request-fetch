@@ -28,65 +28,55 @@ var processHttpResponse = async (response, config) => {
   const { headers, ok, redirected, status, statusText, type, url } = response;
   return { data, config, headers, ok, redirected, status, statusText, type, url };
 };
-var Http = class {
-  constructor(baseURL = "", defaultConfig = {}) {
-    this.baseURL = baseURL;
-    this.defaultConfig = defaultConfig;
-    this.interceptor = {
-      onRequest: (config) => config,
-      onResponse: (response) => response,
-      onRequestError: (reason) => Promise.reject(reason),
-      onResponseError: (reason) => Promise.reject(reason)
-    };
-  }
-  registerInterceptor(interceptor) {
-    this.interceptor = {
-      ...this.interceptor,
-      ...interceptor
-    };
-  }
-  request(url, config) {
+var createHttp = (baseURL = "", defaultConfig = {}) => {
+  let interceptor = {
+    onRequest: (config) => config,
+    onResponse: (response) => response,
+    onRequestError: (reason) => Promise.reject(reason),
+    onResponseError: (reason) => Promise.reject(reason)
+  };
+  const request = async (url, config) => {
     if (!url.startsWith("http")) {
-      url = `${this.baseURL}${url}`;
+      url = `${baseURL}${url}`;
     }
-    config = { ...this.defaultConfig, ...this.interceptor.onRequest(config) };
-    config.headers = { ...this.defaultConfig.headers, ...config.headers };
+    config = { ...defaultConfig, ...interceptor.onRequest(config) };
+    config.headers = { ...defaultConfig.headers, ...config.headers };
     try {
-      return fetch(url, config).then((response) => processHttpResponse(response, config)).then(this.interceptor.onResponse).catch(this.interceptor.onResponseError);
+      const response = await fetch(url, config);
+      return processHttpResponse(response, config).then(interceptor.onResponse).catch(interceptor.onResponseError);
     } catch (reason) {
-      return this.interceptor.onRequestError(reason);
+      return interceptor.onRequestError(reason);
     }
-  }
-  get(url, config = {}) {
-    return this.request(url, {
+  };
+  return {
+    request,
+    get: (url, config = {}) => request(url, {
       ...config,
       method: "GET"
-    });
-  }
-  post(url, config = {}) {
-    return this.request(url, {
+    }),
+    post: (url, config = {}) => request(url, {
       ...config,
       method: "POST"
-    });
-  }
-  patch(url, config = {}) {
-    return this.request(url, {
+    }),
+    patch: (url, config = {}) => request(url, {
       ...config,
       method: "PATCH"
-    });
-  }
-  put(url, config = {}) {
-    return this.request(url, {
+    }),
+    put: (url, config = {}) => request(url, {
       ...config,
       method: "PUT"
-    });
-  }
-  delete(url, config = {}) {
-    return this.request(url, {
+    }),
+    delete: (url, config = {}) => request(url, {
       ...config,
       method: "DELETE"
-    });
-  }
+    }),
+    registerInterceptor: (customInterceptor) => {
+      interceptor = {
+        ...interceptor,
+        ...customInterceptor
+      };
+    }
+  };
 };
-var src_default = Http;
+var src_default = createHttp;
 //# sourceMappingURL=index.cjs.map
