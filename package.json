@@ -1,6 +1,28 @@
 {
   "name": "http-request-fetch",
-  "version": "0.2.0",
+  "version": "0.2.1",
+  "description": "The http request module based on the fetch API.",
+  "keywords": [
+    "http",
+    "fetch",
+    "fetch-api",
+    "request",
+    "ajax"
+  ],
+  "homepage": "https://github.com/woo-jk/http-request-fetch",
+  "bugs": {
+    "url": "https://github.com/woo-jk/http-request-fetch/issues",
+    "email": "wjk6044@gmail.com"
+  },
+  "author": {
+    "name": "woo-jk",
+    "email": "wjk6044@gmail.com",
+    "url": "https://github.com/woo-jk"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/woo-jk/http-request-fetch"
+  },
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
