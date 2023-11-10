@@ -1,6 +1,6 @@
 {
-  "name": "create-http",
-  "version": "0.1.4",
+  "name": "http-request-fetch",
+  "version": "0.2.0",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
