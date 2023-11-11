@@ -4,19 +4,29 @@ fetch API에 기반한 http 요청 모듈입니다.
 
 # 설치 방법
 
+Using npm:
+
 ```
 npm i http-request-fetch
+```
 
+Using yarn:
+
+```
 yarn add http-request-fetch
 ```
 
 # 사용 방법
 
-```js
-// ES Module
-import createHttp from "http-request-fetch";
+in ES Module:
 
-// Common JS
+```js
+import createHttp from "http-request-fetch";
+```
+
+in CommonJS:
+
+```js
 const createHttp = require("http-request-fetch").default;
 ```
 
